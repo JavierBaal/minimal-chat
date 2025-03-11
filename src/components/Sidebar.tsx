@@ -18,7 +18,9 @@ const Sidebar = ({
 }: SidebarProps) => {
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showPinDialog, setShowPinDialog] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!getFromLocalStorage("securePin", ""),
+  );
   const [storedPin, setStoredPin] = useState(
     getFromLocalStorage("securePin", ""),
   );
@@ -71,9 +73,14 @@ const Sidebar = ({
   };
 
   const handleSettingsClick = () => {
-    if (!isPinSetup || !isAuthenticated) {
+    // Si el PIN está configurado pero no autenticado, pedir PIN
+    if (isPinSetup && !isAuthenticated) {
+      setShowPinDialog(true);
+    } else if (!isPinSetup) {
+      // Si no hay PIN configurado, mostrar diálogo para configurarlo
       setShowPinDialog(true);
     } else {
+      // Si ya está autenticado, mostrar panel directamente
       setShowConfigPanel(true);
     }
   };
@@ -85,6 +92,9 @@ const Sidebar = ({
       saveToLocalStorage("securePin", hashedPin);
       setStoredPin(hashedPin);
       onSetupPin(pin);
+      setIsAuthenticated(true);
+      setShowPinDialog(false);
+      setShowConfigPanel(true);
     } else {
       // Verifica el PIN
       const hashedPin = btoa(pin);
