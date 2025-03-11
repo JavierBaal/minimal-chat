@@ -9,22 +9,16 @@ import KnowledgeBaseManager from "./components/KnowledgeBaseManager";
 import { getFromLocalStorage } from "./lib/storage";
 
 function App() {
-  const [isPinSetup, setIsPinSetup] = useState(!!getFromLocalStorage("securePin", ""));
-  const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
-
-  const handleSetupPin = () => {
-    setIsPinSetup(true);
-  };
-
+  // Add a simple console log to check if the component is rendering
+  console.log("App component rendering");
+  
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-        {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-      </>
-    </Suspense>
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1">
+        <ChatArea />
+      </div>
+    </div>
   );
 }
 

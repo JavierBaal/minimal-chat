@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getFromLocalStorage } from "@/lib/storage";
 
 interface ModelOption {
   id: string;
@@ -66,6 +67,52 @@ const ModelSelector = ({
     setSelectedModelDetails(model);
     onModelChange(modelId);
   };
+
+  // Add logic to filter models based on available API keys
+  const getAvailableModels = () => {
+    const apiKeys = getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" });
+    
+    let availableModels = [];
+    
+    if (apiKeys.openAI) {
+      availableModels = availableModels.concat([
+        {
+          id: "gpt-4o",
+          name: "GPT-4o",
+          provider: "OpenAI",
+          description: "Most capable model for complex tasks",
+        },
+        {
+          id: "gpt-3.5-turbo",
+          name: "GPT-3.5 Turbo",
+          provider: "OpenAI",
+          description: "Fast and efficient for most tasks",
+        }
+      ]);
+    }
+    
+    if (apiKeys.deepSeek) {
+      availableModels = availableModels.concat([
+        {
+          id: "deepseek-chat",
+          name: "DeepSeek Chat",
+          provider: "DeepSeek",
+          description: "General purpose chat model",
+        },
+        {
+          id: "deepseek-coder",
+          name: "DeepSeek Coder",
+          provider: "DeepSeek",
+          description: "Specialized for code generation and analysis",
+        }
+      ]);
+    }
+    
+    return availableModels.length > 0 ? availableModels : modelOptions;
+  };
+  
+  // Use available models
+  const availableModels = getAvailableModels();
 
   return (
     <Card className="w-full bg-card border rounded-md shadow-sm">
