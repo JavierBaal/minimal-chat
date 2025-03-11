@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import ConfigPanel from "./ConfigPanel";
 import PinDialog from "./PinDialog";
 import ThemeToggle from "./ThemeToggle";
+import { saveToLocalStorage, getFromLocalStorage } from "@/lib/storage";
 
 interface SidebarProps {
   isPinSetup?: boolean;
@@ -18,11 +19,12 @@ const Sidebar = ({
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [apiKeys, setApiKeys] = useState({ openAI: "", deepSeek: "" });
-  const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  const [storedPin, setStoredPin] = useState(getFromLocalStorage("securePin", ""));
+  const [theme, setTheme] = useState<"light" | "dark">(getFromLocalStorage("theme", "light"));
+  const [apiKeys, setApiKeys] = useState(getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" }));
+  const [selectedModel, setSelectedModel] = useState(getFromLocalStorage("selectedModel", "gpt-4o"));
   const [systemPrompt, setSystemPrompt] = useState(
-    "You are a helpful AI assistant. Answer questions accurately and concisely.",
+    getFromLocalStorage("systemPrompt", "You are a helpful AI assistant. Answer questions accurately and concisely.")
   );
 
   const handleThemeChange = (newTheme: "light" | "dark") => {
@@ -30,16 +32,31 @@ const Sidebar = ({
     // In a real app, you would apply the theme to the document or use a theme context
   };
 
+  // Carga las configuraciones al inicio
+  useEffect(() => {
+    // Aplica el tema
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+
   const handleApiKeysChange = (keys: { openAI: string; deepSeek: string }) => {
     setApiKeys(keys);
+    saveToLocalStorage("apiKeys", keys);
   };
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
+    saveToLocalStorage("selectedModel", modelId);
   };
 
   const handleSystemPromptChange = (prompt: string) => {
     setSystemPrompt(prompt);
+    saveToLocalStorage("systemPrompt", prompt);
+  };
+
+  const handleThemeChange = (newTheme: "light" | "dark") => {
+    setTheme(newTheme);
+    saveToLocalStorage("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   const handleFileUpload = (file: File) => {
@@ -57,12 +74,22 @@ const Sidebar = ({
 
   const handlePinSubmit = (pin: string) => {
     if (!isPinSetup) {
+      // Guarda el PIN con un hash simple (en producción usa bcrypt)
+      const hashedPin = btoa(pin); // Codificación básica, no segura para producción
+      saveToLocalStorage("securePin", hashedPin);
+      setStoredPin(hashedPin);
       onSetupPin(pin);
-      localStorage.setItem("hasSetupPin", "true");
+    } else {
+      // Verifica el PIN
+      const hashedPin = btoa(pin);
+      if (hashedPin === storedPin) {
+        setIsAuthenticated(true);
+        setShowPinDialog(false);
+        setShowConfigPanel(true);
+      } else {
+        alert("PIN incorrecto. Inténtalo de nuevo.");
+      }
     }
-    setIsAuthenticated(true);
-    setShowPinDialog(false);
-    setShowConfigPanel(true);
   };
 
   const handleCloseConfig = () => {
