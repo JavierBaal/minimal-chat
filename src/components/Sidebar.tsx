@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Settings, Lock } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
@@ -19,17 +19,29 @@ const Sidebar = ({
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [storedPin, setStoredPin] = useState(getFromLocalStorage("securePin", ""));
-  const [theme, setTheme] = useState<"light" | "dark">(getFromLocalStorage("theme", "light"));
-  const [apiKeys, setApiKeys] = useState(getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" }));
-  const [selectedModel, setSelectedModel] = useState(getFromLocalStorage("selectedModel", "gpt-4o"));
+  const [storedPin, setStoredPin] = useState(
+    getFromLocalStorage("securePin", ""),
+  );
+  const [theme, setTheme] = useState<"light" | "dark">(
+    getFromLocalStorage("theme", "light"),
+  );
+  const [apiKeys, setApiKeys] = useState(
+    getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" }),
+  );
+  const [selectedModel, setSelectedModel] = useState(
+    getFromLocalStorage("selectedModel", "gpt-4o"),
+  );
   const [systemPrompt, setSystemPrompt] = useState(
-    getFromLocalStorage("systemPrompt", "You are a helpful AI assistant. Answer questions accurately and concisely.")
+    getFromLocalStorage(
+      "systemPrompt",
+      "You are a helpful AI assistant. Answer questions accurately and concisely.",
+    ),
   );
 
   const handleThemeChange = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
-    // In a real app, you would apply the theme to the document or use a theme context
+    saveToLocalStorage("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   // Carga las configuraciones al inicio
@@ -51,12 +63,6 @@ const Sidebar = ({
   const handleSystemPromptChange = (prompt: string) => {
     setSystemPrompt(prompt);
     saveToLocalStorage("systemPrompt", prompt);
-  };
-
-  const handleThemeChange = (newTheme: "light" | "dark") => {
-    setTheme(newTheme);
-    saveToLocalStorage("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   const handleFileUpload = (file: File) => {
