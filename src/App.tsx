@@ -1,10 +1,11 @@
 import React from "react";
 // Fix the duplicate imports by combining them
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useRoutes } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import ChatArea from "./components/ChatArea";
 import { useEffect } from "react";
 import { initStorage } from "./utils/storage";
+import routes from "./tempo-routes";
 
 function App() {
   useEffect(() => {
@@ -16,6 +17,9 @@ function App() {
 
   return (
     <div className="w-full h-screen bg-background">
+      {/* Tempo routes */}
+      {import.meta.env.VITE_TEMPO && useRoutes(routes)}
+
       <Routes>
         {/* Add this before any catchall route */}
         {import.meta.env.VITE_TEMPO && (
