@@ -2,21 +2,21 @@ import { getFromLocalStorage } from "./storage";
 import { getFiles } from "./knowledgeBase";
 
 // Function to search in past conversations
+// Modify searchInMemory to use persistent storage
 export const searchInMemory = async (query: string): Promise<string> => {
-  // Get all past messages
-  const allMessages = getFromLocalStorage("chatMessages", []);
+  // Obtener todos los mensajes pasados desde el almacenamiento persistente
+  const allMessages = await getFromStorage("chatMessages", []);
   
   if (allMessages.length === 0) {
     return "No tengo conversaciones pasadas guardadas en mi memoria.";
   }
   
-  // Get search phrases
-  const searchPhrases = getFromLocalStorage("memorySearchPhrases", [
+  // Obtener frases de búsqueda
+  const searchPhrases = await getFromStorage("memorySearchPhrases", [
     "Déjame buscar en mis recuerdos...",
     "Voy a escarbar en mi memoria para encontrar eso...",
     "Recuerdo que hablamos de esto antes, permíteme buscar...",
     "Estoy consultando nuestras conversaciones anteriores...",
-    "Dame un momento para recordar nuestra charla sobre ese tema..."
   ]);
   
   // Select a random phrase

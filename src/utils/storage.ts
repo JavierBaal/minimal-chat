@@ -11,8 +11,46 @@ declare global {
 }
 
 // Then modify the isElectron function
+// Modify isElectron check to include portable mode
 const isElectron = () => {
   return typeof window !== 'undefined' && window.electron !== undefined;
+};
+
+// Add portable data path detection
+const getStoragePath = () => {
+  if (isElectron() && process.argv.includes('--portable')) {
+    const path = window.require('path');
+    const appPath = window.require('electron').app.getAppPath();
+    return path.join(appPath, 'data');
+  }
+  return null;
+};
+
+// Update initStorage function
+export const initStorage = async () => {
+  if (isElectron()) {
+    const storagePath = getStoragePath();
+    if (storagePath) {
+      // Create data directory if it doesn't exist
+      const fs = window.require('fs');
+      if (!fs.existsSync(storagePath)) {
+        fs.mkdirSync(storagePath);
+      }
+    }
+    
+    const keys = ["apiKeys", "selectedModel", "systemPrompt", "maxContextMessages", "aiName", "memorySearchPhrases", "theme", "chatMessages", "pin"];
+    
+    for (const key of keys) {
+      try {
+        const data = await window.electron.invoke('getData', key, null, storagePath);
+        if (data !== null) {
+          localStorage.setItem(key, JSON.stringify(data));
+        }
+      } catch (error) {
+        console.error(`Error initializing storage for ${key}:`, error);
+      }
+    }
+  }
 };
 
 // Función para obtener datos del almacenamiento
@@ -44,22 +82,38 @@ export const saveToStorage = async (key: string, value: any) => {
   if (isElectron()) {
     // Usar IPC para guardar datos en el sistema de archivos
     try {
-      // @ts-ignore - Electron API
       await window.electron.invoke('saveData', key, value);
+      // También guardamos en localStorage para compatibilidad
+      localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.error(`Error saving data for ${key}:`, error);
+      console.error("Error saving to file system:", error);
       return false;
     }
   } else {
-    // Fallback a localStorage para desarrollo web
+    // Comportamiento normal para navegador
     try {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.error(`Error saving to localStorage for ${key}:`, error);
+      console.error("Error saving to localStorage:", error);
       return false;
     }
+  }
+};
+
+export const getFromStorage = async (key: string, defaultValue: any) => {
+  if (isElectron()) {
+    try {
+      const data = await window.electron.invoke('getData', key, defaultValue);
+      return data;
+    } catch (error) {
+      console.error("Error getting from file system:", error);
+      return defaultValue;
+    }
+  } else {
+    // Comportamiento normal para navegador
+    return getFromLocalStorage(key, defaultValue);
   }
 };
 
@@ -97,34 +151,5 @@ export const saveToLocalStorage = (key: string, value: any) => {
     saveToStorage(key, value).catch(error => {
       console.error(`Error saving to storage: ${error}`);
     });
-  }
-};
-
-// Inicializar: cargar datos del sistema de archivos al localStorage al inicio
-export const initStorage = async () => {
-  if (isElectron()) {
-    const keys = [
-      "apiKeys",
-      "selectedModel",
-      "systemPrompt",
-      "maxContextMessages",
-      "aiName",
-      "memorySearchPhrases",
-      "theme",
-      "chatMessages",
-      "pin"
-    ];
-    
-    for (const key of keys) {
-      try {
-        // @ts-ignore - Electron API
-        const data = await window.electron.invoke('getData', key, null);
-        if (data !== null) {
-          localStorage.setItem(key, JSON.stringify(data));
-        }
-      } catch (error) {
-        console.error(`Error initializing storage for ${key}:`, error);
-      }
-    }
   }
 };
