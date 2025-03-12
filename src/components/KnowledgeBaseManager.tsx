@@ -4,11 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Separator } from "./ui/separator";
 import { saveFile, deleteFile, getFiles, KnowledgeFile } from "@/lib/knowledgeBase";
 
+// Add onFileDelete to the props interface
 interface KnowledgeBaseManagerProps {
+  onFileDelete: () => void;
   onFileChange?: () => void;
 }
 
-const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({ onFileChange }) => {
+// Make sure the component accepts this prop
+const KnowledgeBaseManager = ({ onFileDelete }: KnowledgeBaseManagerProps) => {
   const [files, setFiles] = useState<KnowledgeFile[]>(getFiles());
   const [isUploading, setIsUploading] = useState(false);
 

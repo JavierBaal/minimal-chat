@@ -338,34 +338,42 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
 
 export default Sidebar;
 
-// Move handleExportData inside the component
+// Function to export all settings and chat history
 const handleExportData = () => {
+  // Collect all data from localStorage
   const dataToExport = {
-    apiKeys,
-    selectedModel,
-    systemPrompt,
-    maxContextMessages,
-    aiName,
-    memorySearchPhrases,
-    theme,
-    chatMessages: getFromLocalStorage("chatMessages", [])
+    apiKeys: getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" }),
+    selectedModel: getFromLocalStorage("selectedModel", "gpt-4o"),
+    systemPrompt: getFromLocalStorage("systemPrompt", "You are a helpful AI assistant. Answer questions accurately and concisely."),
+    maxContextMessages: getFromLocalStorage("maxContextMessages", 10),
+    aiName: getFromLocalStorage("aiName", "Mentor Bukowski"),
+    memorySearchPhrases: getFromLocalStorage("memorySearchPhrases", []),
+    theme: getFromLocalStorage("theme", "light"),
+    chatMessages: getFromLocalStorage("chatMessages", []),
   };
 
+  // Convert to JSON string
   const jsonData = JSON.stringify(dataToExport, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   
+  // Create a blob and download link
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  
+  // Create download link and trigger download
   const a = document.createElement("a");
   a.href = url;
   a.download = `minimal-chat-backup-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a);
   a.click();
   
+  // Clean up
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
 
-// Move handleImportData inside the component
+// Function to import settings and chat history
 const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -375,11 +383,12 @@ const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const importedData = JSON.parse(e.target?.result as string);
       
+      // Validate the imported data
       if (!importedData || typeof importedData !== 'object') {
         throw new Error("Invalid backup file format");
       }
       
-      // Update localStorage and state
+      // Restore each setting to localStorage
       if (importedData.apiKeys) {
         saveToLocalStorage("apiKeys", importedData.apiKeys);
         setApiKeys(importedData.apiKeys);
