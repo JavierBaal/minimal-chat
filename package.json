@@ -91,14 +91,9 @@
       "electron/**/*",
       "package.json"
     ],
-    "extraResources": [
-      {
-        "from": "dist",
-        "to": "dist",
-        "filter": [
-          "**/*"
-        ]
-      }
+    "asar": true,
+    "asarUnpack": [
+      "dist/**/*"
     ],
     "win": {
       "target": [
@@ -111,9 +106,6 @@
         "dmg"
       ],
       "artifactName": "MinimalChat-${version}.dmg"
-    },
-    "electronDownload": {
-      "mirror": "https://github.com/electron/electron/releases/download/"
     }
   }
 }

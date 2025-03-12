@@ -1,5 +1,6 @@
 import React from "react";
-import { useRoutes, Routes, Route } from "react-router-dom";
+// Fix the duplicate imports by combining them
+import { useRoutes, Routes, Route, BrowserRouter } from "react-router-dom";
 import routes from "tempo-routes";
 import Sidebar from "./components/Sidebar";
 import ChatArea from "./components/ChatArea";
@@ -42,3 +43,10 @@ function App() {
 }
 
 export default App;
+
+// Remove this line:
+// import ... from "tempo-routes";
+
+// If you need routing functionality, use react-router-dom instead:
+// Remove this duplicate import line:
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
