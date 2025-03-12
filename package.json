@@ -32,5 +32,8 @@
   },
   "devDependencies": {
     "electron": "^35.0.1"
+  },
+  "dependencies": {
+    "tempo-devtools": "^2.0.95"
   }
 }
