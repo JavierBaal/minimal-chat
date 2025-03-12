@@ -1,0 +1,3 @@
+@echo off
+echo Iniciando Minimal Chat...
+start "" "%~dp0dist_electron\win-unpacked\MinimalChat.exe"
