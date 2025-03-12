@@ -3,10 +3,16 @@ import { useRoutes, Routes, Route } from "react-router-dom";
 import routes from "tempo-routes";
 import Sidebar from "./components/Sidebar";
 import ChatArea from "./components/ChatArea";
+import { useEffect } from 'react';
+import { initStorage } from './utils/storage';
 
 function App() {
-  // Add a simple console log to check if the component is rendering
-  console.log("App component rendering");
+  useEffect(() => {
+    // Inicializar el almacenamiento al cargar la aplicación
+    initStorage().catch(error => {
+      console.error("Error initializing storage:", error);
+    });
+  }, []);
 
   return (
     <div className="w-full h-screen bg-background">
