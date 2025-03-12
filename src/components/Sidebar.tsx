@@ -43,7 +43,7 @@ const Sidebar = ({
   );
   // Add the maxContextMessages state
   const [maxContextMessages, setMaxContextMessages] = useState(
-    getFromLocalStorage("maxContextMessages", 10)
+    getFromLocalStorage("maxContextMessages", 10),
   );
 
   const handleThemeChange = (newTheme: "light" | "dark") => {
@@ -56,9 +56,12 @@ const Sidebar = ({
   useEffect(() => {
     // Aplica el tema
     document.documentElement.classList.toggle("dark", theme === "dark");
-    
+
     // Load saved context size
-    const savedMaxContextMessages = getFromLocalStorage("maxContextMessages", 10);
+    const savedMaxContextMessages = getFromLocalStorage(
+      "maxContextMessages",
+      10,
+    );
     setMaxContextMessages(savedMaxContextMessages);
   }, [theme]);
 
@@ -76,7 +79,7 @@ const Sidebar = ({
     setSystemPrompt(prompt);
     saveToLocalStorage("systemPrompt", prompt);
   };
-  
+
   // Add the handler for context size changes
   const handleMaxContextMessagesChange = (value: number[]) => {
     const newValue = value[0];
@@ -129,6 +132,11 @@ const Sidebar = ({
     setShowConfigPanel(false);
   };
 
+  // Add state for AI name
+  const [aiName, setAiName] = useState(
+    getFromLocalStorage("aiName", "Mentor Bukowski"),
+  );
+
   // Add state for memory search phrases
   const [memorySearchPhrases, setMemorySearchPhrases] = useState<string[]>(
     getFromLocalStorage("memorySearchPhrases", [
@@ -136,17 +144,23 @@ const Sidebar = ({
       "Voy a escarbar en mi memoria para encontrar eso...",
       "Recuerdo que hablamos de esto antes, permíteme buscar...",
       "Estoy consultando nuestras conversaciones anteriores...",
-      "Dame un momento para recordar nuestra charla sobre ese tema..."
-    ])
+      "Dame un momento para recordar nuestra charla sobre ese tema...",
+    ]),
   );
-  
+
+  // Add handler for AI name change
+  const handleAiNameChange = (name: string) => {
+    setAiName(name);
+    saveToLocalStorage("aiName", name);
+  };
+
   // Add handler for memory search phrases
   const handleMemorySearchPhrasesChange = (phrases: string) => {
     const phrasesArray = phrases
-      .split('\n')
-      .map(phrase => phrase.trim())
-      .filter(phrase => phrase.length > 0);
-    
+      .split("\n")
+      .map((phrase) => phrase.trim())
+      .filter((phrase) => phrase.length > 0);
+
     setMemorySearchPhrases(phrasesArray);
     saveToLocalStorage("memorySearchPhrases", phrasesArray);
   };
@@ -182,18 +196,18 @@ const Sidebar = ({
             <div className="p-4 flex items-center justify-between border-b sticky top-0 bg-background z-10">
               <div className="flex items-center">
                 <Lock className="h-5 w-5 mr-2 text-primary" />
-                <h2 className="text-lg font-medium">Configuration Panel</h2>
+                <h2 className="text-lg font-medium">Panel de Configuración</h2>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <span className="text-sm text-muted-foreground">Tema</span>
                   <ThemeToggle
                     theme={theme}
                     onThemeChange={handleThemeChange}
                   />
                 </div>
                 <Button variant="outline" size="sm" onClick={handleCloseConfig}>
-                  Close
+                  Cerrar
                 </Button>
               </div>
             </div>
@@ -211,10 +225,12 @@ const Sidebar = ({
                 onSystemPromptChange={handleSystemPromptChange}
                 onFileUpload={handleFileUpload}
               />
-              
+
               {/* Add the context size slider */}
               <div className="mt-6 space-y-2">
-                <label className="text-sm font-medium">Tamaño de la ventana de contexto</label>
+                <label className="text-sm font-medium">
+                  Tamaño de la ventana de contexto
+                </label>
                 <div className="flex items-center space-x-2">
                   <Slider
                     value={[maxContextMessages]}
@@ -226,21 +242,42 @@ const Sidebar = ({
                   <span className="text-sm">{maxContextMessages} mensajes</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Número de mensajes anteriores que se incluirán como contexto para la IA
+                  Número de mensajes anteriores que se incluirán como contexto
+                  para la IA
                 </p>
               </div>
-              
+
+              {/* AI Name Configuration */}
+              <div className="mt-6 space-y-2">
+                <label className="text-sm font-medium">Nombre de la IA</label>
+                <input
+                  type="text"
+                  value={aiName}
+                  onChange={(e) => handleAiNameChange(e.target.value)}
+                  placeholder="Nombre de la IA"
+                  className="w-full p-2 border rounded-md"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Este nombre se mostrará en las respuestas de la IA
+                </p>
+              </div>
+
               {/* Memory search phrases */}
               <div className="mt-6 space-y-2">
-                <label className="text-sm font-medium">Frases para búsqueda en memoria</label>
-                <Textarea 
-                  value={memorySearchPhrases.join('\n')}
-                  onChange={(e) => handleMemorySearchPhrasesChange(e.target.value)}
+                <label className="text-sm font-medium">
+                  Frases para búsqueda en memoria
+                </label>
+                <Textarea
+                  value={memorySearchPhrases.join("\n")}
+                  onChange={(e) =>
+                    handleMemorySearchPhrasesChange(e.target.value)
+                  }
                   placeholder="Ingresa frases que la IA usará cuando busque en su memoria..."
                   className="min-h-[120px]"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Ingresa una frase por línea. La IA seleccionará aleatoriamente una de estas frases cuando busque en conversaciones pasadas.
+                  Ingresa una frase por línea. La IA seleccionará aleatoriamente
+                  una de estas frases cuando busque en conversaciones pasadas.
                 </p>
               </div>
             </div>
@@ -252,29 +289,3 @@ const Sidebar = ({
 };
 
 export default Sidebar;
-
-// Make sure the aiName state is properly defined
-const [aiName, setAiName] = useState(
-  getFromLocalStorage("aiName", "Mentor Bukowski")
-);
-
-// And the handler function is correctly implemented
-const handleAiNameChange = (name: string) => {
-  setAiName(name);
-  saveToLocalStorage("aiName", name);
-};
-
-// Add this in the ConfigPanel section, inside the div with className="flex-1 overflow-y-auto p-4"
-<div className="mt-6 space-y-2">
-  <label className="text-sm font-medium">Nombre del Asistente</label>
-  <input
-    type="text"
-    value={aiName}
-    onChange={(e) => handleAiNameChange(e.target.value)}
-    placeholder="Nombre para mostrar del asistente"
-    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-  />
-  <p className="text-xs text-muted-foreground">
-    Este nombre se mostrará en los mensajes del asistente
-  </p>
-</div>

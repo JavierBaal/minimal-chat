@@ -20,7 +20,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [aiName, setAiName] = useState(
-    getFromLocalStorage("aiName", "Mentor Bukowski")
+    getFromLocalStorage("aiName", "Mentor Bukowski"),
   );
 
   // Load saved messages on init
@@ -28,13 +28,13 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
     const savedMessages = getFromLocalStorage("chatMessages", []);
     if (savedMessages.length > 0) {
       // Convert dates from string to Date
-      const messagesWithDates = savedMessages.map(msg => ({
+      const messagesWithDates = savedMessages.map((msg) => ({
         ...msg,
-        timestamp: new Date(msg.timestamp)
+        timestamp: new Date(msg.timestamp),
       }));
       setLocalMessages(messagesWithDates);
     }
-    
+
     // Load saved AI name
     const savedAiName = getFromLocalStorage("aiName", "Mentor Bukowski");
     setAiName(savedAiName);
@@ -54,7 +54,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
-    
+
     // Create a new user message
     const newMessage: Message = {
       id: `user-${Date.now()}`,
@@ -66,28 +66,28 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
     // Update local messages
     setLocalMessages((prev) => [...prev, newMessage]);
     setInputMessage("");
-    
+
     // Set loading state
     setIsLoading(true);
-    
+
     try {
       // Get system prompt
       const systemPrompt = getFromLocalStorage(
-        "systemPrompt", 
-        "You are a helpful AI assistant. Answer questions accurately and concisely."
+        "systemPrompt",
+        "You are a helpful AI assistant. Answer questions accurately and concisely.",
       );
-      
+
       // Build conversation history for context
       const conversationHistory = buildConversationHistory(localMessages);
-      
+
       // Check if there are knowledge files
       const hasKnowledgeFiles = getFiles().length > 0;
-      
+
       // Call API with or without knowledge
-      const aiResponse = hasKnowledgeFiles 
+      const aiResponse = hasKnowledgeFiles
         ? await callAIWithKnowledge(message, systemPrompt, conversationHistory)
         : await callAI(message, systemPrompt, conversationHistory);
-      
+
       // Create a new AI message
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
@@ -95,7 +95,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
         sender: "ai",
         timestamp: new Date(),
       };
-      
+
       // Update local messages
       setLocalMessages((prev) => [...prev, aiMessage]);
     } catch (error: any) {
@@ -106,7 +106,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
         sender: "ai",
         timestamp: new Date(),
       };
-      
+
       setLocalMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -114,33 +114,37 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
   };
 
   // Build conversation history for context
-  const buildConversationHistory = (messages: Message[]): { role: string, content: string }[] => {
+  const buildConversationHistory = (
+    messages: Message[],
+  ): { role: string; content: string }[] => {
     // Get the maximum number of messages to include in context
     const maxContextMessages = getFromLocalStorage("maxContextMessages", 10);
-    
+
     // Get the most recent messages up to the limit
     const recentMessages = messages.slice(-maxContextMessages);
-    
+
     // Convert to the format expected by the API
-    return recentMessages.map(msg => ({
+    return recentMessages.map((msg) => ({
       role: msg.sender === "user" ? "user" : "assistant",
-      content: msg.content
+      content: msg.content,
     }));
   };
 
   const handleClearChat = () => {
-    if (window.confirm("¿Estás seguro de que quieres borrar toda la conversación?")) {
+    if (
+      window.confirm(
+        "¿Estás seguro de que quieres borrar toda la conversación?",
+      )
+    ) {
       setLocalMessages([]);
       saveToLocalStorage("chatMessages", []);
     }
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center p-2 border-b">
-        <div className="w-24">
-          {/* Empty div for spacing */}
-        </div>
+    <div className="flex flex-col h-full w-full">
+      <div className="flex justify-between items-center p-2 border-b w-full">
+        <div className="w-24">{/* Empty div for spacing */}</div>
         <h2 className="text-lg font-medium text-center flex-1">{aiName}</h2>
         <div className="w-24 flex justify-end">
           <button
@@ -151,7 +155,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 w-full">
         {localMessages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-muted-foreground text-center">
@@ -190,8 +194,8 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="border-t p-4">
-        <div className="flex space-x-2">
+      <div className="border-t p-4 w-full">
+        <div className="flex space-x-2 w-full">
           <input
             type="text"
             value={inputMessage}

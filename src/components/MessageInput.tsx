@@ -14,7 +14,7 @@ interface MessageInputProps {
 
 const MessageInput = ({
   onSendMessage = () => {},
-  placeholder = "Type your message here...",
+  placeholder = "Escribe un mensaje...",
   disabled = false,
   allowAttachments = true,
   allowVoice = true,
@@ -77,7 +77,7 @@ const MessageInput = ({
               variant="ghost"
               className="h-8 w-8 rounded-full"
               disabled={disabled}
-              title="Attach file"
+              title="Adjuntar archivo"
             >
               <Paperclip className="h-4 w-4" />
             </Button>
@@ -90,7 +90,7 @@ const MessageInput = ({
               variant="ghost"
               className="h-8 w-8 rounded-full"
               disabled={disabled}
-              title="Voice message"
+              title="Mensaje de voz"
             >
               <Mic className="h-4 w-4" />
             </Button>
@@ -103,7 +103,7 @@ const MessageInput = ({
               variant="ghost"
               className="h-8 w-8 rounded-full"
               disabled={disabled}
-              title="Add emoji"
+              title="Añadir emoji"
             >
               <Smile className="h-4 w-4" />
             </Button>
@@ -115,7 +115,7 @@ const MessageInput = ({
             disabled={!isTyping || disabled}
             onClick={handleSendMessage}
             className="h-8 w-8 rounded-full"
-            title="Send message"
+            title="Enviar mensaje"
           >
             <Send className="h-4 w-4" />
           </Button>
@@ -123,7 +123,7 @@ const MessageInput = ({
       </div>
 
       <div className="mt-1 text-xs text-muted-foreground text-center">
-        Press Enter to send, Shift+Enter for new line
+        Presiona Enter para enviar, Shift+Enter para nueva línea
       </div>
     </div>
   );
