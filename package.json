@@ -91,10 +91,7 @@
       "electron/**/*",
       "package.json"
     ],
-    "asar": true,
-    "asarUnpack": [
-      "dist/**/*"
-    ],
+    "asar": false,
     "win": {
       "target": [
         "portable"
