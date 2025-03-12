@@ -20,7 +20,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [aiName, setAiName] = useState(
-    getFromLocalStorage("aiName", "Mentor Bukowski")
+    getFromLocalStorage("aiName", "Mentor Bukowski"),
   );
 
   // Add an effect to listen for changes to the AI name
@@ -47,13 +47,19 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
     const handleAiNameChange = (e: CustomEvent) => {
       setAiName(e.detail);
     };
-  
+
     // Add event listener
-    window.addEventListener("aiNameChanged", handleAiNameChange as EventListener);
-  
+    window.addEventListener(
+      "aiNameChanged",
+      handleAiNameChange as EventListener,
+    );
+
     // Cleanup
     return () => {
-      window.removeEventListener("aiNameChanged", handleAiNameChange as EventListener);
+      window.removeEventListener(
+        "aiNameChanged",
+        handleAiNameChange as EventListener,
+      );
     };
   }, []);
 
@@ -197,36 +203,38 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
             </p>
           </div>
         ) : (
-          // In the ChatArea component, we'll modify the message rendering
-          localMessages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`p-3 rounded-lg ${
-                msg.sender === "user"
-                  ? "bg-primary text-primary-foreground ml-auto"
-                  : "bg-muted mr-auto font-mono" // Added font-mono class for AI messages
-              } max-w-[80%]`}
-            >
-              <div className="font-medium mb-1">
-                {msg.sender === "user" ? "Yo:" : `${aiName}:`}
+          <>
+            {/* Message rendering */}
+            {localMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`p-3 rounded-lg ${
+                  msg.sender === "user"
+                    ? "bg-primary text-primary-foreground ml-auto"
+                    : "bg-muted mr-auto font-mono" // Added font-mono class for AI messages
+                } max-w-[80%]`}
+              >
+                <div className="font-medium mb-1">
+                  {msg.sender === "user" ? "Yo:" : `${aiName}:`}
+                </div>
+                {msg.content}
+                <div className="text-xs opacity-70 mt-1">
+                  {new Date(msg.timestamp).toLocaleTimeString()}
+                </div>
               </div>
-              {msg.content}
-              <div className="text-xs opacity-70 mt-1">
-                {new Date(msg.timestamp).toLocaleTimeString()}
+            ))}
+            {/* Loading indicator */}
+            {isLoading && (
+              <div className="bg-muted p-3 rounded-lg mr-auto max-w-[80%] font-mono">
+                <div className="font-medium mb-1">{aiName}:</div>
+                <div className="flex space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></div>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></div>
+                </div>
               </div>
-            </div>
-          ))}
-          // Also update the loading indicator to match
-          {isLoading && (
-            <div className="bg-muted p-3 rounded-lg mr-auto max-w-[80%] font-mono">
-              <div className="font-medium mb-1">{aiName}:</div>
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></div>
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></div>
-              </div>
-            </div>
-          )}
+            )}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
