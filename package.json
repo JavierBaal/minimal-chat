@@ -12,8 +12,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "electron": "electron .",
     "electron-dev": "concurrently \"npm run dev\" \"electron .\"",
-    "build:win": "npm run build && electron-builder --win portable",
-    "build:mac": "npm run build && electron-builder --mac dmg"
+    "build:win": "npm run build && npx electron-builder --win portable",
+    "build:mac": "npm run build && npx electron-builder --mac dmg"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -83,25 +83,35 @@
   "build": {
     "appId": "com.minimalchat.app",
     "productName": "Minimal Chat",
-    "portable": {
-      "artifactName": "MinimalChat.exe"
-    },
     "directories": {
       "output": "dist_electron"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist",
+        "filter": ["**/*"]
+      }
     ],
     "win": {
       "target": [
         "portable"
-      ]
+      ],
+      "artifactName": "MinimalChat-${version}.exe"
     },
     "mac": {
       "target": [
         "dmg"
-      ]
+      ],
+      "artifactName": "MinimalChat-${version}.dmg"
+    },
+    "electronDownload": {
+      "mirror": "https://github.com/electron/electron/releases/download/"
     }
   }
 }

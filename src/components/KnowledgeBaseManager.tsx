@@ -7,11 +7,14 @@ import { saveFile, deleteFile, getFiles, KnowledgeFile } from "@/lib/knowledgeBa
 // Add onFileDelete to the props interface
 interface KnowledgeBaseManagerProps {
   onFileDelete: () => void;
-  onFileChange?: () => void;
+  onFileChange?: () => void; // Add this prop
 }
 
 // Make sure the component accepts this prop
-const KnowledgeBaseManager = ({ onFileDelete }: KnowledgeBaseManagerProps) => {
+const KnowledgeBaseManager = ({ 
+  onFileDelete,
+  onFileChange 
+}: KnowledgeBaseManagerProps) => {
   const [files, setFiles] = useState<KnowledgeFile[]>(getFiles());
   const [isUploading, setIsUploading] = useState(false);
 
