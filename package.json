@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "A minimal chat application",
   "main": "electron/main.js",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
