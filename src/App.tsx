@@ -19,7 +19,9 @@ function App() {
 
       <Routes>
         {/* Add this before any catchall route */}
-        {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
+        {import.meta.env.VITE_TEMPO && (
+          <Route path="/tempobook/*" element={<div />} />
+        )}
 
         <Route
           path="*"
