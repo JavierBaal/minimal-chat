@@ -1,13 +1,19 @@
 {
-  "name": "starter",
+  "name": "minimal-chat",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A minimal chat application",
+  "main": "electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "start": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"electron .\"",
+    "build:win": "npm run build && electron-builder --win portable",
+    "build:mac": "npm run build && electron-builder --mac dmg"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -65,10 +71,37 @@
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react-swc": "3.5.0",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8",
     "postcss": "^8.4.38",
     "tailwindcss": "3.4.1",
     "tempo-devtools": "^2.0.94",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "build": {
+    "appId": "com.minimalchat.app",
+    "productName": "Minimal Chat",
+    "portable": {
+      "artifactName": "MinimalChat.exe"
+    },
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    }
   }
 }
