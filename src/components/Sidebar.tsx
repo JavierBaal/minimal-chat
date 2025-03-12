@@ -289,11 +289,13 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
               {/* Backup and Restore */}
               <div className="mt-8 space-y-4 border-t pt-4">
                 <h3 className="text-lg font-medium">Backup y Restauración</h3>
-                
+
                 {/* Export Button */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Exportar configuración y memoria</label>
-                  <Button 
+                  <label className="text-sm font-medium">
+                    Exportar configuración y memoria
+                  </label>
+                  <Button
                     onClick={handleExportData}
                     className="w-full"
                     variant="outline"
@@ -301,13 +303,16 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
                     Exportar Backup
                   </Button>
                   <p className="text-xs text-muted-foreground">
-                    Guarda todas tus configuraciones y el historial de chat en un archivo JSON
+                    Guarda todas tus configuraciones y el historial de chat en
+                    un archivo JSON
                   </p>
                 </div>
-                
+
                 {/* Import Section */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Importar configuración y memoria</label>
+                  <label className="text-sm font-medium">
+                    Importar configuración y memoria
+                  </label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="file"
@@ -324,7 +329,8 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
                     </label>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Restaura tus configuraciones y el historial de chat desde un archivo de backup
+                    Restaura tus configuraciones y el historial de chat desde un
+                    archivo de backup
                   </p>
                 </div>
               </div>
@@ -339,12 +345,15 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
 export default Sidebar;
 
 // Function to export all settings and chat history
-const handleExportData = () => {
+function handleExportData() {
   // Collect all data from localStorage
   const dataToExport = {
     apiKeys: getFromLocalStorage("apiKeys", { openAI: "", deepSeek: "" }),
     selectedModel: getFromLocalStorage("selectedModel", "gpt-4o"),
-    systemPrompt: getFromLocalStorage("systemPrompt", "You are a helpful AI assistant. Answer questions accurately and concisely."),
+    systemPrompt: getFromLocalStorage(
+      "systemPrompt",
+      "You are a helpful AI assistant. Answer questions accurately and concisely.",
+    ),
     maxContextMessages: getFromLocalStorage("maxContextMessages", 10),
     aiName: getFromLocalStorage("aiName", "Mentor Bukowski"),
     memorySearchPhrases: getFromLocalStorage("memorySearchPhrases", []),
@@ -356,25 +365,23 @@ const handleExportData = () => {
   const jsonData = JSON.stringify(dataToExport, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  
-  // Create a blob and download link
-  const blob = new Blob([jsonData], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  
+
+  // Create download link
+
   // Create download link and trigger download
   const a = document.createElement("a");
   a.href = url;
   a.download = `minimal-chat-backup-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a);
   a.click();
-  
+
   // Clean up
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-};
+}
 
 // Function to import settings and chat history
-const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+function handleImportData(event: React.ChangeEvent<HTMLInputElement>) {
   const file = event.target.files?.[0];
   if (!file) return;
 
@@ -382,56 +389,61 @@ const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
   reader.onload = (e) => {
     try {
       const importedData = JSON.parse(e.target?.result as string);
-      
+
       // Validate the imported data
-      if (!importedData || typeof importedData !== 'object') {
+      if (!importedData || typeof importedData !== "object") {
         throw new Error("Invalid backup file format");
       }
-      
+
       // Restore each setting to localStorage
       if (importedData.apiKeys) {
         saveToLocalStorage("apiKeys", importedData.apiKeys);
-        setApiKeys(importedData.apiKeys);
       }
       if (importedData.selectedModel) {
         saveToLocalStorage("selectedModel", importedData.selectedModel);
-        setSelectedModel(importedData.selectedModel);
       }
       if (importedData.systemPrompt) {
         saveToLocalStorage("systemPrompt", importedData.systemPrompt);
-        setSystemPrompt(importedData.systemPrompt);
       }
       if (importedData.maxContextMessages) {
-        saveToLocalStorage("maxContextMessages", importedData.maxContextMessages);
-        setMaxContextMessages(importedData.maxContextMessages);
+        saveToLocalStorage(
+          "maxContextMessages",
+          importedData.maxContextMessages,
+        );
       }
       if (importedData.aiName) {
         saveToLocalStorage("aiName", importedData.aiName);
-        setAiName(importedData.aiName);
       }
       if (importedData.memorySearchPhrases) {
-        saveToLocalStorage("memorySearchPhrases", importedData.memorySearchPhrases);
-        setMemorySearchPhrases(importedData.memorySearchPhrases);
+        saveToLocalStorage(
+          "memorySearchPhrases",
+          importedData.memorySearchPhrases,
+        );
       }
       if (importedData.theme) {
         saveToLocalStorage("theme", importedData.theme);
-        setTheme(importedData.theme);
       }
       if (importedData.chatMessages) {
         saveToLocalStorage("chatMessages", importedData.chatMessages);
       }
-      
+
       // Apply theme
-      document.documentElement.classList.toggle("dark", importedData.theme === "dark");
-      
-      alert("Configuración y memoria restauradas correctamente. Recarga la página para ver todos los cambios.");
-      
+      document.documentElement.classList.toggle(
+        "dark",
+        importedData.theme === "dark",
+      );
+
+      alert(
+        "Configuración y memoria restauradas correctamente. Recarga la página para ver todos los cambios.",
+      );
     } catch (error) {
       console.error("Error importing data:", error);
-      alert("Error al importar la configuración. Verifica que el archivo sea válido.");
+      alert(
+        "Error al importar la configuración. Verifica que el archivo sea válido.",
+      );
     }
   };
-  
+
   reader.readAsText(file);
-  event.target.value = '';
-};
+  event.target.value = "";
+}
