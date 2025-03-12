@@ -260,7 +260,7 @@ const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
                   value={aiName}
                   onChange={(e) => handleAiNameChange(e.target.value)}
                   placeholder="Nombre de la IA"
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md bg-background text-foreground"
                 />
                 <p className="text-xs text-muted-foreground">
                   Este nombre se mostrará en las respuestas de la IA

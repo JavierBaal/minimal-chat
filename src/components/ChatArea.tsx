@@ -197,13 +197,14 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
             </p>
           </div>
         ) : (
+          // In the ChatArea component, we'll modify the message rendering
           localMessages.map((msg) => (
             <div
               key={msg.id}
               className={`p-3 rounded-lg ${
                 msg.sender === "user"
                   ? "bg-primary text-primary-foreground ml-auto"
-                  : "bg-muted mr-auto"
+                  : "bg-muted mr-auto font-mono" // Added font-mono class for AI messages
               } max-w-[80%]`}
             >
               <div className="font-medium mb-1">
@@ -214,17 +215,18 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
                 {new Date(msg.timestamp).toLocaleTimeString()}
               </div>
             </div>
-          ))
-        )}
-        {isLoading && (
-          <div className="bg-muted p-3 rounded-lg mr-auto max-w-[80%]">
-            <div className="font-medium mb-1">{aiName}:</div>
-            <div className="flex space-x-2">
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></div>
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></div>
+          ))}
+          // Also update the loading indicator to match
+          {isLoading && (
+            <div className="bg-muted p-3 rounded-lg mr-auto max-w-[80%] font-mono">
+              <div className="font-medium mb-1">{aiName}:</div>
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></div>
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></div>
+              </div>
             </div>
-          </div>
+          )}
         )}
         <div ref={messagesEndRef} />
       </div>
