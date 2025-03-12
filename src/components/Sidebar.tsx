@@ -14,15 +14,14 @@ interface SidebarProps {
   onSetupPin?: (pin: string) => void;
 }
 
-const Sidebar = ({
-  isPinSetup = false,
-  onSetupPin = () => {},
-}: SidebarProps) => {
+const Sidebar = ({ onSetupPin = () => {} }: SidebarProps) => {
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showPinDialog, setShowPinDialog] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(
+  // Verificar si el PIN ya está configurado al inicio
+  const [isPinSetup, setIsPinSetup] = useState(
     !!getFromLocalStorage("securePin", ""),
   );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [storedPin, setStoredPin] = useState(
     getFromLocalStorage("securePin", ""),
   );
@@ -111,6 +110,7 @@ const Sidebar = ({
       const hashedPin = btoa(pin); // Codificación básica, no segura para producción
       saveToLocalStorage("securePin", hashedPin);
       setStoredPin(hashedPin);
+      setIsPinSetup(true); // Actualiza el estado para indicar que el PIN está configurado
       onSetupPin(pin);
       setIsAuthenticated(true);
       setShowPinDialog(false);
@@ -153,7 +153,7 @@ const Sidebar = ({
   const handleAiNameChange = (name: string) => {
     setAiName(name);
     saveToLocalStorage("aiName", name);
-    
+
     // Dispatch a custom event to notify other components
     const event = new CustomEvent("aiNameChanged", { detail: name });
     window.dispatchEvent(event);
@@ -294,57 +294,6 @@ const Sidebar = ({
 };
 
 export default Sidebar;
-
-
-// In the Sidebar component, update the PIN handling logic
-
-// Make sure you have these state variables at the top of your component
-const [pin, setPin] = useState(getFromLocalStorage("settingsPin", ""));
-const [pinInput, setPinInput] = useState("");
-const [isPinSet, setIsPinSet] = useState(Boolean(getFromLocalStorage("settingsPin", "")));
-const [showPinDialog, setShowPinDialog] = useState(false);
-
-// Update the function that handles settings button click
-const handleSettingsClick = () => {
-  const savedPin = getFromLocalStorage("settingsPin", "");
-  
-  if (savedPin) {
-    // If PIN exists, show PIN verification dialog
-    setShowPinDialog(true);
-    setShowSettings(false);
-  } else {
-    // If no PIN exists, show settings directly
-    setShowSettings(true);
-    setShowPinDialog(false);
-  }
-};
-
-// Update the function that handles PIN verification
-const handleVerifyPin = () => {
-  const savedPin = getFromLocalStorage("settingsPin", "");
-  
-  if (pinInput === savedPin) {
-    // PIN is correct, show settings
-    setShowSettings(true);
-    setShowPinDialog(false);
-    setPinInput("");
-  } else {
-    // PIN is incorrect
-    alert("PIN incorrecto");
-  }
-};
-
-// Update the function that handles setting a new PIN
-const handleSetPin = () => {
-  if (pinInput.trim()) {
-    saveToLocalStorage("settingsPin", pinInput);
-    setPin(pinInput);
-    setIsPinSet(true);
-    setPinInput("");
-    // Close PIN dialog if it's open
-    setShowPinDialog(false);
-  }
-};
 
 // Make sure your PIN dialog UI checks isPinSet to determine whether to show
 // "Set PIN" or "Enter PIN" UI
