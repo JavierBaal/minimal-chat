@@ -149,9 +149,14 @@ const Sidebar = ({
   );
 
   // Add handler for AI name change
+  // In the Sidebar component where the AI name is changed
   const handleAiNameChange = (name: string) => {
     setAiName(name);
     saveToLocalStorage("aiName", name);
+    
+    // Dispatch a custom event to notify other components
+    const event = new CustomEvent("aiNameChanged", { detail: name });
+    window.dispatchEvent(event);
   };
 
   // Add handler for memory search phrases
@@ -289,3 +294,57 @@ const Sidebar = ({
 };
 
 export default Sidebar;
+
+
+// In the Sidebar component, update the PIN handling logic
+
+// Make sure you have these state variables at the top of your component
+const [pin, setPin] = useState(getFromLocalStorage("settingsPin", ""));
+const [pinInput, setPinInput] = useState("");
+const [isPinSet, setIsPinSet] = useState(Boolean(getFromLocalStorage("settingsPin", "")));
+const [showPinDialog, setShowPinDialog] = useState(false);
+
+// Update the function that handles settings button click
+const handleSettingsClick = () => {
+  const savedPin = getFromLocalStorage("settingsPin", "");
+  
+  if (savedPin) {
+    // If PIN exists, show PIN verification dialog
+    setShowPinDialog(true);
+    setShowSettings(false);
+  } else {
+    // If no PIN exists, show settings directly
+    setShowSettings(true);
+    setShowPinDialog(false);
+  }
+};
+
+// Update the function that handles PIN verification
+const handleVerifyPin = () => {
+  const savedPin = getFromLocalStorage("settingsPin", "");
+  
+  if (pinInput === savedPin) {
+    // PIN is correct, show settings
+    setShowSettings(true);
+    setShowPinDialog(false);
+    setPinInput("");
+  } else {
+    // PIN is incorrect
+    alert("PIN incorrecto");
+  }
+};
+
+// Update the function that handles setting a new PIN
+const handleSetPin = () => {
+  if (pinInput.trim()) {
+    saveToLocalStorage("settingsPin", pinInput);
+    setPin(pinInput);
+    setIsPinSet(true);
+    setPinInput("");
+    // Close PIN dialog if it's open
+    setShowPinDialog(false);
+  }
+};
+
+// Make sure your PIN dialog UI checks isPinSet to determine whether to show
+// "Set PIN" or "Enter PIN" UI

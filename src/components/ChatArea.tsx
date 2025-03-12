@@ -20,8 +20,42 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [aiName, setAiName] = useState(
-    getFromLocalStorage("aiName", "Mentor Bukowski"),
+    getFromLocalStorage("aiName", "Mentor Bukowski")
   );
+
+  // Add an effect to listen for changes to the AI name
+  useEffect(() => {
+    // Function to handle storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "aiName" && e.newValue) {
+        setAiName(e.newValue);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  // Add this to the existing useEffect or create a new one
+  useEffect(() => {
+    // Function to handle AI name changes
+    const handleAiNameChange = (e: CustomEvent) => {
+      setAiName(e.detail);
+    };
+  
+    // Add event listener
+    window.addEventListener("aiNameChanged", handleAiNameChange as EventListener);
+  
+    // Cleanup
+    return () => {
+      window.removeEventListener("aiNameChanged", handleAiNameChange as EventListener);
+    };
+  }, []);
 
   // Load saved messages on init
   useEffect(() => {
@@ -207,7 +241,7 @@ const ChatArea: React.FC<ChatAreaProps> = (props) => {
               }
             }}
             placeholder="Escribe un mensaje..."
-            className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
           />
           <button
             onClick={() => handleSendMessage(inputMessage)}
